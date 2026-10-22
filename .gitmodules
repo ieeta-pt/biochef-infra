@@ -1,0 +1,16 @@
+[submodule "biochef-agent"]
+	path = biochef-agent
+	url = https://github.com/ieeta-pt/biochef-agent.git
+	branch = master
+[submodule "biochef-app"]
+	path = biochef-app
+	url = https://github.com/ieeta-pt/Biochef.git
+	branch = main
+[submodule "biochef-hub"]
+	path = biochef-hub
+	url = https://github.com/ieeta-pt/biochef-hub.git
+	branch = master
+[submodule "biochef-recipes"]
+	path = biochef-recipes
+	url = https://github.com/ieeta-pt/biochef-recipes.git
+	branch = master
