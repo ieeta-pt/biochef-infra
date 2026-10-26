@@ -14,3 +14,7 @@
 	path = biochef-recipes
 	url = https://github.com/ieeta-pt/biochef-recipes.git
 	branch = master
+[submodule "biochef-coordinator"]
+	path = biochef-coordinator
+	url = https://github.com/ieeta-pt/biochef-coordinator.git
+	branch = master
