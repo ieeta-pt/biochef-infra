@@ -16,7 +16,7 @@ These rules apply to every BioChef repo: [biochef-app](https://github.com/ieeta-
 |---|---|
 | `master` | The only long-lived branch in every repo. It always works, and nobody pushes to it directly. |
 | Branch names | `feat/…`, `fix/…`, `docs/…`, `chore/…`, `hotfix/…`, or `recipe/<tool>` in biochef-recipes. Short-lived. |
-| Release | A [SemVer](https://semver.org) tag `vX.Y.Z` on `master`, made through GitHub Releases. Anyone with write access can release. A tag is never moved or deleted; only the manager's team can, to fix a mistake. |
+| Release | A [SemVer](https://semver.org) tag `vX.Y.Z` on `master`, made through GitHub Releases. Anyone with write access can release. A tag is never moved or deleted; only the project manager can, to fix a mistake. |
 | Hotfix | Branch `hotfix/…` from the release tag and fix it there. Tag the patch on that branch, then bring the fix to `master` with a normal PR. |
 
 ## Pull requests
