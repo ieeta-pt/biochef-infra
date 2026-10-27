@@ -31,9 +31,24 @@ git submodule update --init --recursive
 git submodule update --remote
 ```
 
+## Docs
+
+| Doc | Covers |
+|---|---|
+| [architecture.md](docs/architecture.md) | The pieces, the principles, and how a federated run goes |
+| [deploy.md](docs/deploy.md) | `make up`, `make deploy`, `make agent-deploy`; what is public; every connection |
+| [local.md](docs/local.md) | The local TRE: simulated silos on a laptop |
+| [identity.md](docs/identity.md) | Logging in through Keycloak and LS Login; mTLS for nodes |
+
+The editable draw.io sources are in [docs/diagrams/](docs/diagrams/).
+
 ## Contributing
 
 The rules for every BioChef repo are in [CONTRIBUTING.md](CONTRIBUTING.md).
+
+## Reference
+
+BioChef follows the model of Five Safes TES: Beck et al., *Five Safes TES*, JAMIA (2026), [doi:10.1093/jamia/ocag160](https://academic.oup.com/jamia/advance-article/doi/10.1093/jamia/ocag160/8885674).
 
 ## License
 
