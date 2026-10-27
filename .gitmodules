@@ -4,8 +4,8 @@
 	branch = master
 [submodule "biochef-app"]
 	path = biochef-app
-	url = https://github.com/ieeta-pt/Biochef.git
-	branch = main
+	url = https://github.com/ieeta-pt/biochef-app.git
+	branch = master
 [submodule "biochef-hub"]
 	path = biochef-hub
 	url = https://github.com/ieeta-pt/biochef-hub.git
