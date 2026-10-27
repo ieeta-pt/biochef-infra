@@ -15,9 +15,9 @@ These rules apply to every BioChef repo: [biochef-app](https://github.com/ieeta-
 | Topic | Rule |
 |---|---|
 | `master` | The only long-lived branch in every repo. It always works, and nobody pushes to it directly. |
-| Branch names | `feat/…`, `fix/…`, `docs/…`, `chore/…`, or `recipe/<tool>` in biochef-recipes. Short-lived. |
-| Release | A [SemVer](https://semver.org) tag `vX.Y.Z` on `master`, made through GitHub Releases. A tag is never moved or deleted. |
-| Hotfix | A normal PR to `master`, then tag the next patch version. |
+| Branch names | `feat/…`, `fix/…`, `docs/…`, `chore/…`, `hotfix/…`, or `recipe/<tool>` in biochef-recipes. Short-lived. |
+| Release | A [SemVer](https://semver.org) tag `vX.Y.Z` on `master`, made through GitHub Releases. Anyone with write access can release. A tag is never moved or deleted; only the manager's team can, to fix a mistake. |
+| Hotfix | Branch `hotfix/…` from the release tag and fix it there. Tag the patch on that branch, then bring the fix to `master` with a normal PR. |
 
 ## Pull requests
 
@@ -32,8 +32,8 @@ These rules apply to every BioChef repo: [biochef-app](https://github.com/ieeta-
 
 | Rule | Detail |
 |---|---|
-| Pins point only at commits on `master` | Never at a PR branch |
-| Moving the pins is a PR to `biochef-infra` | Same flow as any other change |
+| Pins point at release tags | Until a repo has releases, at commits on `master`. Never at a PR branch |
+| Moving the pins is its own PR to `biochef-infra` | Prepare it with `git submodule update --remote` |
 | To try a PR branch, check it out inside the submodule | `git submodule update` returns to the pin; never commit that pointer |
 
 ## Never
@@ -43,3 +43,4 @@ These rules apply to every BioChef repo: [biochef-app](https://github.com/ieeta-
 | Push to `master`, or force-push a branch someone else uses | It loses or rewrites other people's work |
 | Move or delete a release tag | A tag must always mean the same code |
 | Commit `.env` files, keys or credentials | A pushed secret stays in the history even after it is deleted |
+| Commit real data | Tests and examples use synthetic data only |
