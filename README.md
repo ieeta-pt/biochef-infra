@@ -37,8 +37,8 @@ git submodule update --remote
 |---|---|
 | [architecture.md](docs/architecture.md) | The pieces, the principles, and how a federated run goes |
 | [deploy.md](docs/deploy.md) | `make up`, `make deploy`, `make agent-deploy`; what is public; every connection |
-| [local.md](docs/local.md) | The local TRE: simulated silos on a laptop |
-| [identity.md](docs/identity.md) | Logging in through Keycloak and LS Login; mTLS for nodes |
+| [local-build.md](docs/local-build.md) | The local TRE: simulated silos on a laptop |
+| [identity.md](docs/identity.md) | Logging in through Keycloak and LS Login; how members' keys are tied to them; mTLS for nodes |
 
 The editable draw.io sources are in [docs/diagrams/](docs/diagrams/).
 
@@ -48,7 +48,7 @@ The rules for every BioChef repo are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Reference
 
-BioChef follows the model of Five Safes TES: Beck et al., *Five Safes TES*, JAMIA (2026), [doi:10.1093/jamia/ocag160](https://academic.oup.com/jamia/advance-article/doi/10.1093/jamia/ocag160/8885674).
+BioChef's agent follows the pattern of Five Safes TES: it runs inside each TRE and opens every connection, and outputs pass the TRE's review. The coordinator only stores and forwards jobs and results it cannot read, and that is where BioChef differs. Beck et al., *Five Safes TES*, JAMIA (2026), [doi:10.1093/jamia/ocag160](https://academic.oup.com/jamia/advance-article/doi/10.1093/jamia/ocag160/8885674).
 
 ## License
 
