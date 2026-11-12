@@ -8,7 +8,7 @@
 |---|---|
 | Central pieces | Caddy, the editor dev server, Keycloak brokering LS Login's test instance, the coordinator, and a local global registry seeded from production. Each is reachable at `*.biochef.localhost`, bound to `127.0.0.1` |
 | Outside the laptop | LS Login's test instance, where researchers log in with test accounts and the editor gets the ID token for a member's keys ([identity.md](identity.md#locally)); and the production registry, which seeds the local one |
-| A silo | The agent, a synthetic data store and a silo registry, on an internal network. No route through Caddy and no published port. The silo's `.env` picks where the agent gets its tools: avenue A, the global registry, or avenue B, the silo registry ([deploy.md](deploy.md#registry)). The agent is built from its Dockerfile, which comes with [biochef-agent#73](https://github.com/ieeta-pt/biochef-agent/pull/73), still open |
+| A silo | The agent, a synthetic data store and a silo registry, on an internal network. No route through Caddy and no published port. The silo's `.env` picks where the agent gets its tools: avenue A, the global registry, or avenue B, the silo registry ([deploy.md](deploy.md#registry)). The agent is built from `biochef-agent` ([agent.md](agent.md)) |
 | Silo registry | Filled only from an encrypted tar, which a `make` step exports from the local global registry and loads into the silo. It never connects out. Locally both registries hold the same versions, because they come from the same seed; in a deployment they can differ |
 | Egress | A proxy that lets a silo reach the coordinator, and the global registry only under avenue A |
 | `make shell` | A shell inside the silo: the operator's way in |

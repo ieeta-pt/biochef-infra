@@ -34,10 +34,16 @@ Researchers never talk to the agent, and the registry needs no login. A person's
 
 A node trusts a job because it is signed with a member's key, so each node has to know the key is that member's.
 
-1. When members register their signing and result keys with the coordinator (`PUT /me/keys`), the editor gets an ID token directly from LS Login, not through Keycloak. The editor is registered at LS Login as a public client and asks only for the `openid` scope.
-2. The token's nonce is the SHA-256 of the member's signing and result keys in RFC 8785 form.
+1. When members register their signing and result keys with the coordinator (`PUT /me/keys`), the editor gets an ID token directly from LS Login, not through Keycloak. The editor is registered at LS Login as a public client and asks for the `openid profile` scopes, so the token carries the member's `name`.
+2. The token's nonce binds both keys. The editor builds this object from the keys exactly as it sends them to `PUT /me/keys`: the signing key as a P-256 JWK with only `kty`, `crv`, `x` and `y` (`x` and `y` base64url, as in RFC 7518), and the result key as its age public key string:
+
+   ```json
+   {"result_key": "age1…", "signing_key": {"crv": "P-256", "kty": "EC", "x": "…", "y": "…"}}
+   ```
+
+   It serializes the object with RFC 8785 (JSON Canonicalization Scheme) to UTF-8 bytes, takes their SHA-256, and encodes the 32 bytes as base64url without padding, 43 characters. That string is the nonce.
 3. The keys and the token travel with the member in every study version.
-4. Before the data manager approves a study version, the agent page checks each member's token: its signature against LS Login's keys, its audience (the editor), and its `sub` against the member's LS AAI identifier.
+4. Before the data manager approves a study version, the agent page checks each member's token: its signature against LS Login's keys, its audience (the editor), its `sub` against the member's LS AAI identifier, its nonce against the hash of the keys listed for that member, and its expiry. An expired token is accepted only if it is signed with one of LS Login's keys in the site list's key history. The page then shows the token's `name`, so the data manager sees who they approve.
 5. The signed site list keeps the history of LS Login's keys, so a node can still check a token after LS Login rotates its keys.
 
 ```mermaid
@@ -51,13 +57,13 @@ sequenceDiagram
   K->>L: redirected login
   L-->>K: tokens
   K-->>E: BioChef tokens
-  E->>L: ID token for the member's keys (openid, nonce = SHA-256 of the keys)
+  E->>L: ID token for the member's keys (openid profile, nonce = hash of the keys)
   E->>C: PUT /me/keys: signing key, result key, ID token
   C->>C: validate the Keycloak token: issuer, JWKS, audience
   E->>C: job with the Keycloak token, visas inside, encrypted per node
   A->>C: poll over mTLS
   C-->>A: study version with the members' keys and tokens, and the encrypted task
-  A->>A: check each member's ID token: LS Login keys, audience, sub, nonce
+  A->>A: check each member's ID token: LS Login keys, audience, sub, nonce, expiry
   A->>A: check each visa: pinned issuer, dataset ID, max age, belongs to the member
 ```
 

@@ -36,6 +36,7 @@ git submodule update --remote
 | Doc | Covers |
 |---|---|
 | [architecture.md](docs/architecture.md) | The pieces, the principles, and how a federated run goes |
+| [agent.md](docs/agent.md) | How the agent runs tasks inside a node: checks, runners, outputs |
 | [deploy.md](docs/deploy.md) | `make up`, `make deploy`, `make agent-deploy`; what is public; every connection |
 | [local-build.md](docs/local-build.md) | The local TRE: simulated silos on a laptop |
 | [identity.md](docs/identity.md) | Logging in through Keycloak and LS Login; how members' keys are tied to them; mTLS for nodes |

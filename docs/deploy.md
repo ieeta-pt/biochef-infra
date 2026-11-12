@@ -56,7 +56,7 @@ Who opens each connection, and how it is authenticated ([draw.io](diagrams/05-se
 | 10 | CI → registry | OCI push | Robot account (CI secret) | Signed tools, catalogue |
 | 11 | CI → Sigstore | HTTPS | GitHub OIDC (keyless) | Signatures, transparency log |
 | 12 | Operator → server | SSH | Key, from IEETA or the VPN only | Admin, tunnels to the databases |
-| 13 | Editor → LS Login | OIDC | Public client, `openid` scope only | The ID token that ties the member's keys to them ([identity.md](identity.md#tying-a-members-keys-to-them)) |
+| 13 | Editor → LS Login | OIDC | Public client, `openid profile` scopes | The ID token that ties the member's keys to them ([identity.md](identity.md#tying-a-members-keys-to-them)) |
 
 Never routed: the databases, Keycloak `/admin`, the Docker socket, monitoring, and the agent API and agent page in any TRE.
 
@@ -75,27 +75,16 @@ Either way the agent resolves each tool through the signed catalogue and verifie
 
 ## Nodes
 
-`make agent-deploy` installs the node bundle ([draw.io](diagrams/04-agent-deploy.drawio)):
+`make agent-deploy` installs the node bundle ([draw.io](diagrams/04-agent-deploy.drawio)). How the agent works is in [agent.md](agent.md).
+
 - the agent, with cosign, running as a user that is not root;
-- the step runner the TRE picks, below;
+- the step runner the TRE picks: rootless or rootful Podman, Apptainer or SingularityCE, or a TES server it already runs ([agent.md](agent.md#runners));
 - local policy, which maps each dataset ID to a path;
 - the node's approval and encryption keys, made inside the node;
 - the Sigstore trusted root, the catalogue key and a local base image;
 - strict signing;
 - optionally, a silo registry (avenue B).
 
-Diagrams 02 and 04 build the agent from its Dockerfile, which comes with [biochef-agent#73](https://github.com/ieeta-pt/biochef-agent/pull/73), still open.
-
-The agent launches every step in a container through the runner the TRE picks in its `.env`:
-
-| Runner | Fits | Each step |
-|---|---|---|
-| Podman, rootless | Servers and cloud tenants | No network, its own workspace, a clean environment, a read-only root and limits on processes and memory |
-| Podman, rootful | Hosts whose Podman only runs as root | The same; the agent calls one helper through a single sudo rule, and each step runs as a dedicated user that is neither root nor the agent |
-| Apptainer, or SingularityCE | SLURM clusters, and hosts without Podman | No network, its own workspace, a clean environment |
-
-The agent refuses to start with a runner whose steps could reach the network, unless the operator turns that rule off explicitly, which is audited at every start. At start it runs one step and checks that it has no network. What each runner guarantees is in section 14.1 of the [agent spec](https://github.com/ieeta-pt/biochef-agent/pull/106); the Podman and SingularityCE runners and these checks come with [biochef-agent#120 to #123](https://github.com/ieeta-pt/biochef-agent/pull/120), still open.
-
-Outputs leave only after egress: the study's output rules first, then the TRE's airlock or the data manager's release in the agent page, whichever the node is set up for. The agent page is a separate process on its own port, reachable only inside the TRE.
+The node's `.env` picks the runner and the registry avenue.
 
 Egress is limited to the coordinator (`sites.coordinator.`), the registry (avenue A) and, in remote mode, the data service. There is no Sigstore, Docker Hub or refget access at run time.
