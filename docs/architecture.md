@@ -8,7 +8,7 @@ This doc covers the pieces of BioChef, who talks to whom, and how a federated ru
 |---|---|---|
 | Editor | `biochef-app`: designs workflows, runs tools as WebAssembly, holds the member's keys, signs and encrypts jobs, combines results | Browser |
 | Recipes | `biochef-recipes`: one `biochef.yaml` per tool, plus tiny tests | Git |
-| Tools hub | `biochef-hub`: validates, builds, signs and publishes the recipes; also owns data types and silo information | GitHub Actions |
+| Tools hub | `biochef-hub`: validates, builds, signs and publishes the recipes; also owns data types | GitHub Actions |
 | Registry | One global OCI registry: tools, the signed catalogue, the site list, node descriptors, dataset metadata, synthetic datasets | The central server |
 | Keycloak | Brokers LS Login, issues BioChef's tokens and keeps the login session | The central server |
 | Coordinator | `biochef-coordinator`: studies, workflow approvals, jobs and results. It stores and delivers; it never reads a job or a result. Its state is in Postgres, so it can run as several instances | The central server |

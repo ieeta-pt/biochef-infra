@@ -47,7 +47,7 @@ A node trusts a job because it is signed with a member's key, so each node has t
 
    It serializes the object with RFC 8785 (JSON Canonicalization Scheme) to UTF-8 bytes, takes their SHA-256, and encodes the 32 bytes as base64url without padding, 43 characters. That string is the nonce. Keys in any other form are refused, not normalised, by `PUT /me/keys` and by each node: a normalised key would hash to something the member never signed in for. The [test vector](#nonce-test-vector) is below.
 3. The keys and the token travel with the member in every study version.
-4. Before the data manager approves a study version, the agent page checks each member's token: its signature against LS Login's keys, its audience (the editor), its `sub` against the member's LS AAI identifier, its nonce against the hash of the keys listed for that member, and its expiry. An expired token is accepted only if it is signed with one of LS Login's keys in the site list's key history. The page then shows the token's `name`, so the data manager sees who they approve.
+4. Before the data manager approves a study version, the agent page checks each member's token: its signature against LS Login's keys, its audience (the editor), its `sub` against the member's LS AAI identifier, its nonce against the hash of the keys listed for that member, and its expiry. Once the site list carries LS Login's key history, an expired token is accepted if it is signed with one of the keys in it. Until then, the agent accepts only unexpired tokens and says so on the page. The page then shows the token's `name`, so the data manager sees who they approve.
 5. The signed site list keeps the history of LS Login's keys, so a node can still check a token after LS Login rotates its keys.
 
 ```mermaid

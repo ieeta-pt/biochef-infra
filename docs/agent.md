@@ -81,7 +81,7 @@ Two rules hold for every runner:
 
 The agent can also offer a TES API, a listener of its own, so the TRE's own workflow engines can send tasks to the node and have them run under the agent's runner. It shares no credentials, queue or port with the rest of the agent, needs a token on every request, and reads and writes only listed directories, never the node's datasets.
 
-A TRE that already runs a TES server such as Funnel (ADELE does) can install the agent three ways:
+A TRE that already runs a TES server, such as Funnel, can install the agent three ways:
 
 | | Beside Funnel | Sending steps through Funnel | In place of Funnel |
 |---|---|---|---|
