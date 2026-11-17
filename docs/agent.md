@@ -27,7 +27,7 @@ A task runs only if all of these hold, checked in this order:
 6. It is not a replay. The same task delivered again joins the first run, or gets the same refusal.
 7. It decrypts with the node's encryption key.
 8. The workflow rebuilt from the decrypted tools and values has the digest the member signed.
-9. The member's visas allow every dataset it names, and belong to the member ([identity.md](identity.md#visas)).
+9. The member's visas allow every dataset it names, and belong to the member. Whether the visas come in the job or the agent fetches them from LS Login is still open ([identity.md](identity.md#visas)).
 10. Every dataset it names is bound to data on this node.
 
 ## The agent page

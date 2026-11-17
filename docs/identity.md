@@ -6,7 +6,7 @@ This doc covers how people, their keys, nodes and data access are authenticated 
 
 | Service | Role |
 |---|---|
-| LS Login | The identity provider, always: every researcher logs in with it, in production and locally (its test instance). It issues the ID token that ties a member's keys to them, and the Passport with the visas |
+| LS Login | The identity provider, always: every researcher logs in with it, in production and locally (its test instance). It issues the ID token that ties a member's keys to them, and the Passport with the visas; where each node gets the visas is [open](#visas) |
 | BioChef Keycloak | Sits in front of LS Login: brokers it as its only identity provider, issues BioChef's own tokens, which the coordinator trusts, and keeps the login session. It is never an identity provider itself |
 
 ## What needs an identity
@@ -16,7 +16,7 @@ This doc covers how people, their keys, nodes and data access are authenticated 
 | Researcher | Editor → coordinator | LS Login, through BioChef's Keycloak |
 | Member's keys | Editor → coordinator → each node | An LS Login ID token that names the member and binds their signing and result keys; each node checks it before approving a study |
 | Node (agent) | Agent → coordinator | mTLS at `sites.coordinator.biochef.app`, with a per-site certificate from the federation PKI; the agent checks the coordinator's certificate against the federation CA |
-| Data access | Agent → local data or CEGA/FEGA | GA4GH visas carried in the job, checked at the node; for EGA data, an EGA token carried encrypted in the job |
+| Data access | Agent → local data or CEGA/FEGA | GA4GH visas, checked at the node; whether they come in the job or the node fetches them from LS Login is [open](#visas). For EGA data, how the node gets the member's EGA token is [open](#visas) too |
 | Data manager | Approves studies and workflows in the agent page, inside the TRE | The TRE's own login; the node's approval key signs |
 | CI | Tools hub → Sigstore, registry | GitHub OIDC and registry credentials |
 
@@ -28,7 +28,7 @@ Researchers never talk to the agent, and the registry needs no login. A person's
 2. Keycloak sends the researcher straight to LS Login: the `biochef` realm has LS Login as its only identity provider, and its browser flow uses the *Identity Provider Redirector*. Researchers never see a Keycloak form.
 3. Keycloak issues the BioChef tokens.
 4. The editor calls the coordinator with the Keycloak token; the coordinator validates issuer, JWKS and audience.
-5. The visas travel inside the job, encrypted per node. Each node checks them itself.
+5. Where each node gets the member's visas is open: inside the job, or fetched by the node from LS Login ([Visas](#visas)). Each node checks them itself either way.
 
 ## Tying a member's keys to them
 
@@ -64,10 +64,12 @@ sequenceDiagram
   E->>L: ID token for the member's keys (openid profile, nonce = hash of the keys)
   E->>C: PUT /me/keys: signing key, result key, ID token
   C->>C: validate the Keycloak token: issuer, JWKS, audience
-  E->>C: job with the Keycloak token, visas inside, encrypted per node
+  E->>C: job with the Keycloak token, encrypted per node (option A, open: visas inside)
   A->>C: poll over mTLS
   C-->>A: study version with the members' keys and tokens, and the encrypted task
   A->>A: check each member's ID token: LS Login keys, audience, sub, nonce, expiry
+  A->>L: option B (open): the member's visas, with the node's own LS Login client
+  L-->>A: Passport
   A->>A: check each visa: pinned issuer, dataset ID, max age, belongs to the member
 ```
 
@@ -98,9 +100,20 @@ ZU6yVFLLXiQ1WErqbRJRX9gXa47goE8iHMpLPnozw4A
 
 ## Visas
 
-Each node checks every visa in the job: its issuer, its dataset, its age, and that it belongs to the member. A visa belongs to the member when its `sub` is the member's LS AAI identifier, or is linked to it by a LinkedIdentities visa from a trusted issuer. Without that last check, any valid visa for the dataset would pass.
+Each node checks the member's visas for every dataset a job reads: each visa's issuer, its dataset, its age, and that it belongs to the member. A visa belongs to the member when its `sub` is the member's LS AAI identifier, or is linked to it by a LinkedIdentities visa from a trusted issuer. Without that last check, any valid visa for the dataset would pass.
 
-Nodes never use the Keycloak token as authorization; they rely on the members' ID tokens, the visas in the job and mTLS.
+**Open: where the node gets the visas.** The checks above hold either way. The LS Login refresh token test decides between:
+
+| | A. Inside the job | B. Fetched by each node |
+|---|---|---|
+| How | The editor puts the member's visas in the job, encrypted per node | Each node's agent fetches them with its own LS Login client and the member's offline access |
+| Local data | Works | Works |
+| Data served by the GDI starter kit | Doesn't work: its download service takes the member's token and fetches the visas itself | Works |
+| Trade-off | The editor has to get the member's Passport, and how it does is still open | Each node keeps a long-lived credential per member, and each member consents once per node |
+
+How the node gets the member's token for CEGA/FEGA in remote mode is open too: carried encrypted in the job, or obtained by the node itself.
+
+Nodes never use the Keycloak token as authorization; they rely on the members' ID tokens, the visas and mTLS.
 
 ## Locally
 

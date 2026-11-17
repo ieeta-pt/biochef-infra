@@ -44,7 +44,7 @@ flowchart LR
     REG[("Global registry + catalogue<br/>tools, site list, descriptors,<br/>dataset metadata")]
   end
   ED["Editor or CLI"] -->|"login"| KC
-  ED -->|"ID token for the member's keys"| LS
+  ED -->|"ID token for the member's keys; visas, option A"| LS
   KC -->|"broker"| LS
   ED -->|"catalogue, tools"| REG
   ED -->|"keys, studies, jobs, results"| COORD
@@ -57,6 +57,7 @@ flowchart LR
     end
   end
   LS -->|"collects visas"| ACC
+  AG -.->|"visas, option B (open)"| LS
   AG -->|"mTLS polling, results"| COORD
   AG -->|"OCI pull by digest, avenue A"| REG
   AG -.->|"htsget, remote mode only"| EGA
