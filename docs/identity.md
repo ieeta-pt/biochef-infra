@@ -16,7 +16,7 @@ This doc covers how people, their keys, nodes and data access are authenticated 
 | Researcher | Editor → coordinator | LS Login, through BioChef's Keycloak |
 | Member's keys | Editor → coordinator → each node | An LS Login ID token that names the member and binds their signing and result keys; each node checks it before approving a study |
 | Node (agent) | Agent → coordinator | mTLS at `sites.coordinator.biochef.app`, with a per-site certificate from the federation PKI; the agent checks the coordinator's certificate against the federation CA |
-| Data access | Agent → local data or CEGA/FEGA | GA4GH visas, checked at the node; whether they come in the job or the node fetches them from LS Login is [open](#visas). For EGA data, how the node gets the member's EGA token is [open](#visas) too |
+| Data access | Agent → local data or CEGA/FEGA | GA4GH visas, checked at the node; whether they come in the job or the node fetches them from LS Login is [open](#visas). For EGA data, how the node gets the member's token for CEGA/FEGA is [open](#visas) too |
 | Data manager | Approves studies and workflows in the agent page, inside the TRE | The TRE's own login; the node's approval key signs |
 | CI | Tools hub → Sigstore, registry | GitHub OIDC and registry credentials |
 
@@ -70,7 +70,7 @@ sequenceDiagram
   A->>A: check each member's ID token: LS Login keys, audience, sub, nonce, expiry
   A->>L: option B (open): the member's visas, with the node's own LS Login client
   L-->>A: Passport
-  A->>A: check each visa: pinned issuer, dataset ID, max age, belongs to the member
+  A->>A: check each visa: pinned issuer, the dataset's visa value, max age, belongs to the member
 ```
 
 ### Nonce test vector
@@ -100,18 +100,18 @@ ZU6yVFLLXiQ1WErqbRJRX9gXa47goE8iHMpLPnozw4A
 
 ## Visas
 
-Each node checks the member's visas for every dataset a job reads: each visa's issuer, its dataset, its age, and that it belongs to the member. A visa belongs to the member when its `sub` is the member's LS AAI identifier, or is linked to it by a LinkedIdentities visa from a trusted issuer. Without that last check, any valid visa for the dataset would pass.
+Each node checks the member's visas for every dataset a job reads: each visa's issuer, that its value is exactly the dataset's visa value, its age, and that it belongs to the member. The dataset ID is the node's own name for the data, and visas don't carry it; local policy binds each dataset to the visa value the DAC issues for it ([agent.md](agent.md#datasets)). A visa belongs to the member when its `sub` is the member's LS AAI identifier, or is linked to it by a LinkedIdentities visa from a trusted issuer. Without that last check, any valid visa for the dataset would pass.
 
-**Open: where the node gets the visas.** The checks above hold either way. The LS Login refresh token test decides between:
+**Open: where the node gets the member's visas and token.** The checks above hold either way. The LS Login refresh token test decides between:
 
 | | A. Inside the job | B. Fetched by each node |
 |---|---|---|
 | How | The editor puts the member's visas in the job, encrypted per node | Each node's agent fetches them with its own LS Login client and the member's offline access |
 | Local data | Works | Works |
 | Data served by the GDI starter kit | Doesn't work: its download service takes the member's token and fetches the visas itself | Works |
+| Member's token for remote data (CEGA/FEGA) | In the job, encrypted per node | Fetched by the node itself |
+| Which token | FEGA, through the starter kit: the LS Login token. Central EGA: open, whether it takes the same token | Same as A |
 | Trade-off | The editor has to get the member's Passport, and how it does is still open | Each node keeps a long-lived credential per member, and each member consents once per node |
-
-How the node gets the member's token for CEGA/FEGA in remote mode is open too: carried encrypted in the job, or obtained by the node itself.
 
 Nodes never use the Keycloak token as authorization; they rely on the members' ID tokens, the visas and mTLS.
 

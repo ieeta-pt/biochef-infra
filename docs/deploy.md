@@ -52,7 +52,7 @@ Who opens each connection, and how it is authenticated ([draw.io](diagrams/05-se
 | 6 | Editor → registry | OCI over HTTPS | Anonymous | Catalogue, site list, descriptors, tools |
 | 7 | Agent → `sites.coordinator.` | HTTPS + mTLS | Client certificate from the federation PKI; the agent checks the server certificate against the federation CA, not a pinned certificate | Polls, agent states, tasks, encrypted partials |
 | 8 | Agent → registry (avenue A) | OCI over HTTPS | Anonymous; signatures checked offline | Tools by digest |
-| 9 | Agent → CEGA/FEGA (remote mode) | htsget | The member's EGA token; how the node gets it is open ([identity.md](identity.md#visas)) | Data slices |
+| 9 | Agent → CEGA/FEGA (remote mode) | htsget | The member's token (for FEGA, the LS Login token); how the node gets it is open ([identity.md](identity.md#visas)) | Data slices |
 | 10 | CI → registry | OCI push | Robot account (CI secret) | Signed tools, catalogue |
 | 11 | CI → Sigstore | HTTPS | GitHub OIDC (keyless) | Signatures, transparency log |
 | 12 | Operator → server | SSH | Key, from IEETA or the VPN only | Admin, tunnels to the databases |
